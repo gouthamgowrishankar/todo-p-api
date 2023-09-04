@@ -4,7 +4,7 @@
 
 	<groupId>com.mycompany</groupId>
 	<artifactId>todo-p-api</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
 	<name>todo-p-api</name>
@@ -12,9 +12,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<app.runtime>4.4.0-20230320</app.runtime>
 		<mule.maven.plugin.version>3.8.2</mule.maven.plugin.version>
+		<env.property>dev</env.property>
 	</properties>
 
 	<build>
@@ -30,9 +30,35 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<resources>
+						<resource>
+							<directory>src/main/resources</directory>
+							<filtering>false</filtering>
+							<includes>
+								<include>mule.jks</include>
+							</includes>
+						</resource>
+						<resource>
+							<directory>src/main/resources</directory>
+							<filtering>true</filtering>
+							<includes>
+								<include>dev.yaml</include>
+							</includes>
+						</resource>
+						
+					</resources>
+					<!-- <nonFilteredFileExtensions> 
+						<nonFilteredFileExtension>.jks</nonFilteredFileExtension> 
+					</nonFilteredFileExtensions> -->
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
@@ -60,21 +86,30 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
-
-	<repositories>
+	<distributionManagement>
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>Anypoint Exchange</name>
 			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
 			<layout>default</layout>
 		</repository>
-		<repository>
-			<id>mulesoft-releases</id>
-			<name>MuleSoft Releases Repository</name>
-			<url>https://repository.mulesoft.org/releases/</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
+	
+	</distributionManagement>
+	
+		<repositories>
+			<repository>
+				<id>anypoint-exchange-v3</id>
+				<name>Anypoint Exchange</name>
+				<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+				<layout>default</layout>
+			</repository>
+			<repository>
+				<id>mulesoft-releases</id>
+				<name>MuleSoft Releases Repository</name>
+				<url>https://repository.mulesoft.org/releases/</url>
+				<layout>default</layout>
+			</repository>
+		</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
     <http:listener-config name="todo-p-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
+        <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context"/>
     </http:listener-config>
     <apikit:config name="todo-p-api-config" api="resource::ca6c543e-dbac-46c9-aaa5-59cfe1113e50:todo-p-api:1.0.0:raml:zip:todo-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="40c3e13b-e16c-4ec1-80ad-961368dcf159" basePath="/api" >
@@ -10,6 +11,10 @@
 	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="102f9d64-3b25-471a-a614-7ec29071ab67" basePath="/api">
 		<http:request-connection protocol="HTTPS" host="task-s-api-kqgfpi.5sc6y6-4.usa-e2.cloudhub.io"/>
 	</http:request-config>
+	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="9a0fc6e2-2651-4ff3-aaef-d4a38ec79f27" >
+		<tls:key-store type="jks" path="mule.jks" keyPassword="password" password="password"/>
+	</tls:context>
+	<configuration-properties doc:name="Configuration properties" doc:id="9af6c0c3-9a0a-48cb-a985-8cf82de900b0" file="dev.yaml" />
 	<flow name="todo-p-api-main">
         <http:listener config-ref="todo-p-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -163,7 +168,8 @@ output application/json
 {
 	id:payload.'0'.payload.id,
 	email: payload.'0'.payload.email,
-	tasks: payload.'1'.payload
+	tasks: payload.'1'.payload,
+	env: Mule::p('env.property')
 }]]></ee:set-payload>
             </ee:message>
         </ee:transform>
