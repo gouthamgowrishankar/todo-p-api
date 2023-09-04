@@ -107,7 +107,7 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="todo-p-api-console">
+	<flow name="todo-p-api-console">
         <http:listener config-ref="todo-p-api-httpListenerConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
