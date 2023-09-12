@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
-http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
     <http:listener-config name="todo-p-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${https.port}" protocol="HTTPS" tlsContext="TLS_Context"/>
     </http:listener-config>
-    <apikit:config name="todo-p-api-config" api="resource::ca6c543e-dbac-46c9-aaa5-59cfe1113e50:todo-p-api:1.0.0:raml:zip:todo-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="40c3e13b-e16c-4ec1-80ad-961368dcf159" basePath="/api" >
-		<http:request-connection protocol="HTTPS" host="user-s-api-kqgfpi.5sc6y6-2.usa-e2.cloudhub.io"/>
+    <apikit:config name="todo-p-api-config" api="resource::8521b161-742f-46d4-a28e-2360f0b32415:todo-p-api:1.0.0:raml:zip:todo-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="user-system-api-config" doc:name="HTTP Request configuration" doc:id="40c3e13b-e16c-4ec1-80ad-961368dcf159" basePath="${api.basepath}">
+		<http:request-connection host="${user-s-api.host}" />
 	</http:request-config>
-	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="102f9d64-3b25-471a-a614-7ec29071ab67" basePath="/api">
-		<http:request-connection protocol="HTTPS" host="task-s-api-kqgfpi.5sc6y6-4.usa-e2.cloudhub.io"/>
+	<http:request-config name="task-s-api-config" doc:name="HTTP Request configuration" doc:id="102f9d64-3b25-471a-a614-7ec29071ab67" basePath="${api.basepath}">
+		<http:request-connection host="${task-s-api.host}"/>
 	</http:request-config>
 	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="9a0fc6e2-2651-4ff3-aaef-d4a38ec79f27" >
 		<tls:key-store type="jks" path="mule.jks" keyPassword="password" password="password"/>
 	</tls:context>
 	<configuration-properties doc:name="Configuration properties" doc:id="9af6c0c3-9a0a-48cb-a985-8cf82de900b0" file="dev.yaml" />
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="87d58ca9-7ed7-4aa5-8a78-965fcf148467" flowRef="todo-p-api-main" />
 	<flow name="todo-p-api-main">
         <http:listener config-ref="todo-p-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -135,30 +137,42 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\task\(ownerId):todo-p-api-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:variables>
-                <ee:set-variable variableName="ownerId">attributes.uriParams.'ownerId'</ee:set-variable>
+        <ee:transform doc:name="Transform Message" doc:id="aa23653a-4e1e-457a-8840-2ab3c3ba26d3">
+            <ee:message >
+			</ee:message>
+			<ee:variables>
+                <ee:set-variable variableName="ownerId"><![CDATA[attributes.uriParams.'ownerId']]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <scatter-gather doc:name="Scatter-Gather" doc:id="2253de85-ad05-4828-97b9-aa58c46e9726" >
+		<scatter-gather doc:name="Scatter-Gather" doc:id="2253de85-ad05-4828-97b9-aa58c46e9726" >
 			<route >
-				<http:request method="GET" doc:name="get user detail" doc:id="0af894a5-9d64-4583-b0d2-57179d149fab" config-ref="HTTP_Request_configuration" path="/user/{ownerId}">
-					<http:uri-params ><![CDATA[#[output application/java
+				<http:request method="GET" doc:name="get user detail" doc:id="0af894a5-9d64-4583-b0d2-57179d149fab" config-ref="user-system-api-config" path="/user/{id}">
+			<http:headers><![CDATA[#[{
+	'Content-Type': 'application/json'
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/json
+---
+{
+	id : vars.ownerId
+}]]]></http:uri-params>
+				</http:request>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="fetch all tasks for user" doc:id="c28088f9-2257-4440-bcbf-58f89e999943" config-ref="task-s-api-config" path="/tasks/{ownerId}">
+					<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_id" : p('task-s-api.clientId'),
+	"client_secret": p('task-s-api.clientSecret')
+}]]]></http:headers>
+					<http:uri-params><![CDATA[#[output application/json
 ---
 {
 	ownerId : vars.ownerId
 }]]]></http:uri-params>
 				</http:request>
 			</route>
-			<route >
-				<http:request method="GET" doc:name="fetch all tasks for user" doc:id="c28088f9-2257-4440-bcbf-58f89e999943" config-ref="HTTP_Request_configuration1" path="/tasks/{ownerId}">
-					<http:uri-params ><![CDATA[#[output application/java
----
-{
-	ownerId : vars.ownerId
-}]]]></http:uri-params>
-				</http:request>
-			</route>
+
 		</scatter-gather>
 		<ee:transform doc:name="Transform Message">
             <ee:message>

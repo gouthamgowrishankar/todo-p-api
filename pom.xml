@@ -17,7 +17,7 @@
 	<name>todo-p-api</name>
 
 	<properties>
-		<api.groupId>ca6c543e-dbac-46c9-aaa5-59cfe1113e50</api.groupId>
+		<api.groupId>8521b161-742f-46d4-a28e-2360f0b32415</api.groupId>
 		<api.artifactId>todo-p-api</api.artifactId>
 		<api.version>1.0.0</api.version>
 	</properties>
@@ -33,6 +33,29 @@
 				<artifactId>mule-maven-plugin</artifactId>
 				<extensions>true</extensions>
 				<version>3.8.2</version>
+				<configuration>
+					<cloudhub2Deployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<provider>MC</provider>
+						<environment>Sandbox</environment>
+						<target>Cloudhub-US-East-2</target>
+						<muleVersion>4.4.0</muleVersion>
+						<username>gowrimcd</username>
+						<password>Goutham@7498</password>
+						<applicationName>GowriAppDeployedFromMaven</applicationName>
+						<replicas>1</replicas>
+						<vCores>1</vCores>
+						<!-- <deploymentSettings>
+				        <http>
+				          <inbound>
+				            <publicUrl>${publicURL}</publicUrl>
+				            <forwardSslSession>true</forwardSslSession>
+				            <lastMileSecurity>true</lastMileSecurity>
+				          </inbound>
+				        </http>
+				      </deploymentSettings> -->
+					</cloudhub2Deployment>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

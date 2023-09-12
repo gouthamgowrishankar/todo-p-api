@@ -3,3 +3,15 @@ env:
   
 https:
  port: '8082'
+ 
+api:
+  id: '18963189'
+  basepath: '/api'
+  
+user-s-api:
+  host: 'person-s-api.us-e2.cloudhub.io'
+  
+task-s-api:
+  host: 'task-s-api.us-e2.cloudhub.io'
+  clientId: 'b1a69eaa073f4fecbd1541fdb6c00e4b'
+  clientSecret: 'e39B6cf42c38439AaE4393079090FFE4'
